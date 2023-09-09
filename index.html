@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/black.css">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css">
+        <style>
+            .presentation {
+                display: flex;
+                flex-direction: row;
+            }
+            .presentation-text {
+                flex: 1;
+            }
+
+            .presentation-profile {
+                flex: 0 1 auto;
+            }
+        </style>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+                <section>
+                    <h1>Crear módulos y paquetes en Python</h1>
+                    <h2>De un script a un paquete en PyPi</h2>
+                </section>
+                <section>
+                    <h2>Presentación</h2>
+                    <div class="presentation">
+                        <div class="presentation-text">
+                            <ul>
+                                <li class="fragment" data-fragment-index="1">
+                                    Fernando López
+                                </li>
+                                <li class="fragment" data-fragment-index="2">
+                                    Docente en la Facultad de Informática de la UNLP
+                                </li>
+                                <li class="fragment" data-fragment-index="3">
+                                    Desarrollador Python
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="presentation-profile fragment" data-fragment-index="1">
+                            <img src="assets/me.png" alt="profile">
+                        </div>
+                    </div>
+                    <div class="presentation fragment" data-fragment-index="4">
+                        <div class="presentation-text">
+                            <img src="assets/github.png" alt="linkedin">
+                            <p style="margin:0 !important">github</p>
+                        </div>
+                        <div class="presentation-text">
+                            <img src="assets/cv.png" alt="linkedin">
+                            <p style="margin:0 !important">linkedin</p>
+                        </div>
+                    </div>
+                </section>
+                <section data-markdown="index.md"
+                         data-separator-vertical="^\nvvv\n"
+                         data-separator-notes="^Notes?:">
+                </section>
+			</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+			});
+		</script>
+	</body>
+</html>
