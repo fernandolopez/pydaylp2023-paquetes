@@ -285,8 +285,10 @@ python pomodoro.pyz
 <!-- .slide: data-background="#81ceff" -->
 ## FIN
 
-* ¿Preguntas?
+### ¿Preguntas?
 
 ![github](assets/github.png)
+
 github
 
+¡Gracias!
