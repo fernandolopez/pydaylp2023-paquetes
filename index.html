@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>reveal.js</title>
+
+    <link rel="stylesheet" href="dist/reset.css">
+    <link rel="stylesheet" href="dist/reveal.css">
+    <link rel="stylesheet" href="dist/theme/black.css">
+
+    <!-- Theme used for syntax highlighted code -->
+    <link rel="stylesheet" href="plugin/highlight/monokai.css">
+    <style>
+        .presentation {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .presentation-text {
+            flex: 1;
+        }
+
+        .presentation-profile {
+            flex: 0 1 auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="reveal">
+        <div class="slides"
+            style="width: 960px; height: 700px; inset: 50% auto auto 50%; transform: translate(-50%, -50%) scale(1.21646);">
+            <section style="top: 350px; display: none;" hidden="" aria-hidden="true" class="past" data-index-h="0">
+                <h1>Crear módulos y paquetes en Python</h1>
+                <h2>De un script a un paquete en PyPi</h2>
+            </section>
+            <section style="top: 350px; display: none;" hidden="" aria-hidden="true" class="past" data-index-h="1">
+                <h2>Presentación</h2>
+                <div class="presentation">
+                    <div class="presentation-text">
+                        <ul>
+                            <li class="fragment visible" data-fragment-index="0">
+                                Fernando López
+                            </li>
+                            <li class="fragment visible" data-fragment-index="1">
+                                Docente en la Facultad de Informática de la UNLP
+                            </li>
+                            <li class="fragment visible" data-fragment-index="2">
+                                Desarrollador Python
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="presentation-profile fragment visible" data-fragment-index="0">
+                        <img src="assets/me.png" alt="profile">
+                    </div>
+                </div>
+                <div class="presentation fragment visible" data-fragment-index="3">
+                    <div class="presentation-text">
+                        <img src="assets/github.png" alt="linkedin">
+                        <p style="margin:0 !important"><a href="https://github.com/fernandolopez">github</a></p>
+                    </div>
+                    <div class="presentation-text">
+                        <img src="assets/cv.png" alt="linkedin">
+                        <p style="margin:0 !important"><a href="https://www.linkedin.com/in/fernandoemlopez/">linkedin</a></p>
+                    </div>
+                </div>
+            </section>
+            <section style="top: 350px; display: none;" data-markdown="" data-markdown-parsed="true" hidden=""
+                aria-hidden="true" class="past" data-index-h="2">
+                <h2 id="proyecto-de-ejemplo">Proyecto de ejemplo</h2>
+                <ul>
+                    <li class="fragment visible" data-fragment-index="0">Timer para técnica Pomodoro <!-- --></li>
+                    <li class="fragment visible" data-fragment-index="1">Básicamente una cuenta regresiva <!-- -->
+                    </li>
+                </ul>
+            </section>
+            <section style="top: 350px; display: none;" data-markdown="" data-markdown-parsed="true" hidden=""
+                aria-hidden="true" class="past" data-index-h="3">
+                <h2 id="prototipo">Prototipo</h2>
+                <p><img src="assets/prototype_0.png" alt="Prototipo"></p>
+            </section>
+            <section style="top: 350px; display: none;" data-markdown="" data-markdown-parsed="true" hidden=""
+                aria-hidden="true" class="past" data-index-h="4">
+                <h2 id="modelo">Modelo</h2>
+                <pre class="code-wrapper"><code>class Timer:
+    """
+    A timer that can run for a given number of seconds and call a function
+    """
+
+    def __init__(self, alarm_fn, update_clock_fn):
+        """Initialize the timer"""
+
+    def update(self):
+        """Update the timer and call the alarm function if the timer has expired"""
+
+    def start(self, seconds):
+        """Start the timer for the given number of seconds"""
+
+    def stop(self):
+        """Stop the timer"""</code></pre>
+            </section>
+            <section style="top: 350px; display: none;" data-markdown="" data-markdown-parsed="true" hidden=""
+                aria-hidden="true" class="past" data-index-h="5">
+                <h2 id="código-de-la-interfaz-gráfica">Código de la interfaz gráfica</h2>
+                <pre class="code-wrapper"><code># Create a window and main frame using ttk themed widgets
+root = tk.Tk()
+ttk.Style().theme_use("clam")
+root.title("Pomodoro Timer")
+# ...
+# Create a timer object
+timer = Timer(lambda: None, update_clock)
+# ...
+# Run the main loop
+tk.mainloop()</code></pre>
+            </section>
+            <section style="top: 350px; display: none;" data-markdown="" data-markdown-parsed="true" hidden=""
+                aria-hidden="true" class="past" data-index-h="6">
+                <h2 id="demo-v0">Demo v0</h2>
+                <a href="https://github.com/fernandolopez/pomodorotk/tree/pomodoro_v0">
+                    Código de la demo en GitHub
+                </a>
+            </section>
+            <section style="top: 350px; display: none;" data-markdown="" data-markdown-parsed="true" hidden=""
+                aria-hidden="true" class="past" data-index-h="7">
+                <h2 id="nuevos-requerimientos">Nuevos requerimientos</h2>
+                <ul>
+                    <li>Queremos una alarma sonora</li>
+                    <li>La biblioteca de Python no tiene nada que nos ayude</li>
+                    <li><a href="https://pypi.org/project/pydub/">PyDub</a> + <a
+                            href="https://pypi.org/project/ffmpeg-python/">ffmpeg-python</a></li>
+                </ul>
+            </section>
+            <section style="top: 350px; display: none;" data-markdown="" data-markdown-parsed="true" hidden=""
+                aria-hidden="true" class="past" data-index-h="8">
+                <h2 id="modificaciones">Modificaciones</h2>
+                <pre class="code-wrapper"><code class="diff hljs language-diff">+from pydub import AudioSegment, playback
+ 
+ class Timer:
+     """
+@@ -77,8 +78,15 @@ def update_clock(remainding):
+     root.after(UPDATE_TIME_MS, timer.update)
+ 
+ 
++alarm_sound = AudioSegment.from_mp3("alarm.mp3")
++
++def alarm():
++    """Play the alarm sound"""
++    playback.play(alarm_sound)
++
++
+ # Create a timer object
+-timer = Timer(lambda: None, update_clock)
++timer = Timer(alarm, update_clock)</code></pre>
+            </section>
+            <section style="top: 350px; display: none;" data-markdown="" data-markdown-parsed="true" hidden=""
+                aria-hidden="true" class="past" data-index-h="9">
+                <h2 id="¿cómo-compartimos-nuestra-app">¿Cómo compartimos nuestra app?</h2>
+                <ul>
+                    <li class="fragment visible" data-fragment-index="0">Ahora tenemos una dependencia: PyDub y
+                        ffmpeg-python <!-- --></li>
+                    <li class="fragment visible" data-fragment-index="1">Quién quiera usar nuestra app tiene que
+                        instalarlas <!-- --></li>
+                    <li class="fragment visible" data-fragment-index="2">También está el archivo "alarm.mp3"
+                        <!-- -->
+                    </li>
+                    <li class="fragment visible" data-fragment-index="3">¿Y nuestra app cómo se instala? <!-- -->
+                    </li>
+                </ul>
+            </section>
+            <section style="top: 350px; display: none;" data-markdown="" data-markdown-parsed="true" hidden=""
+                aria-hidden="true" class="past" data-index-h="10">
+                <h2 id="qué-necesitamos">Qué necesitamos</h2>
+                <ul>
+                    <li class="fragment visible" data-fragment-index="0">Una forma estándar de declarar las
+                        dependencias <!-- --></li>
+                    <li class="fragment visible" data-fragment-index="1">Una forma de compartir nuestra app, por
+                        ejemplo en PyPI <!-- --></li>
+                    <li class="fragment visible" data-fragment-index="2">Alternativas: <!-- -->
+                        <ul>
+                            <li class="fragment visible" data-fragment-index="2">setuptools: setup.py +
+                                requirements.txt <!-- --></li>
+                            <li><a href="https://python-poetry.org/" class="fragment visible"
+                                    data-fragment-index="2">Poetry</a>: pyproject.toml + poetry.lock <!-- --></li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+            <section style="top: 350px; display: none;" data-markdown="" data-markdown-parsed="true" hidden=""
+                aria-hidden="true" class="past" data-index-h="11">
+                <h2 id="de-script-a-paquete">De script a paquete</h2>
+                <ul>
+                    <li class="fragment visible" data-fragment-index="0">Para distribuirlo es conveniente armar un
+                        paquete Python <!-- --></li>
+                    <li class="fragment visible" data-fragment-index="1">Un paquete Python está compuesto de:
+                        <!-- -->
+                        <ul>
+                            <li class="fragment visible" data-fragment-index="2">Un directorio <!-- --></li>
+                            <li class="fragment visible" data-fragment-index="3">Un archivo "__init__.py" <!-- -->
+                            </li>
+                            <li class="fragment visible" data-fragment-index="4">Módulos (archivos ".py") <!-- -->
+                            </li>
+                            <li class="fragment visible" data-fragment-index="5">Otros recursos (como el
+                                "alarm.mp3") <!-- --></li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+            <section style="top: 350px; display: none;" data-markdown="" data-markdown-parsed="true" hidden=""
+                aria-hidden="true" class="past" data-index-h="12">
+                <p><img src="assets/v1/estructura_1.png" alt="Estructura"></p>
+            </section>
+            <section style="top: 350px; display: none;" data-markdown="" data-markdown-parsed="true" hidden=""
+                aria-hidden="true" class="past" data-index-h="13">
+                <h2 id="poetry">Poetry</h2>
+                <h3 id="porque-sí">(Porque sí)</h3>
+                <pre
+                    class="code-wrapper"><code>pipx install poetry # o pip...</code></pre>
+            </section>
+            <section style="top: 350px; display: none;" data-markdown="" data-markdown-parsed="true" hidden=""
+                aria-hidden="true" class="past" data-index-h="14">
+                <p><img src="assets/poetry_init.png" alt="poetry init"></p>
+            </section>
+            <section style="top: 350px; display: none;" data-markdown="" data-markdown-parsed="true" hidden=""
+                aria-hidden="true" class="past" data-index-h="15">
+                <h2 id="instalamos-dependencias">Instalamos dependencias</h2>
+                <pre
+                    class="code-wrapper"><code>poetry install</code></pre>
+            </section>
+            <section style="top: 230.5px; display: none;" data-markdown="" data-markdown-parsed="true" hidden=""
+                aria-hidden="true" class="past" data-index-h="16">
+                <h2 id="ejecutamos-nuestro-programa">Ejecutamos nuestro programa</h2>
+                <pre
+                    class="code-wrapper"><code>poetry run python -m pomodorotk.pomodoro</code></pre>
+            </section>
+            <section style="top: 163px; display: none;" data-markdown="" data-markdown-parsed="true" hidden=""
+                aria-hidden="true" class="past" data-index-h="17">
+                <h2 id="lo-publicamos">Lo publicamos</h2>
+                <ol>
+                    <li class="fragment visible" data-fragment-index="0">Creamos una cuenta en PyPI <!-- --></li>
+                    <li class="fragment visible" data-fragment-index="1">Solicitamos una API key <!-- --></li>
+                    <li class="fragment visible" data-fragment-index="2">Configuramos Poetry: poetry config
+                        pypi-token.pypi your-api-token <!-- --></li>
+                    <li class="fragment visible" data-fragment-index="3">Finalmente publicamos: poetry publish
+                        --build <!-- --></li>
+                </ol>
+            </section>
+            <section style="top: 92.5px; display: none;" data-markdown="" data-markdown-parsed="true" class="past"
+                hidden="" aria-hidden="true" data-index-h="18">
+                <p><img src="assets/v1/publish.png" alt="poetry publish"></p>
+                <p><a href="https://pypi.org/project/pomodorotk/">pomodorotk</a></p>
+            </section>
+            <section style="top: 271px; display: none;" data-markdown="" data-markdown-parsed="true" class="past"
+                hidden="" aria-hidden="true" data-index-h="19">
+                <h2 id="demo-v1">Demo v1</h2>
+                <pre
+                    class="code-wrapper"><code>~ /git/charla-paquetes/venv-v1</code></pre>
+                <a href="https://github.com/fernandolopez/pomodorotk/tree/pomodoro_v1_sound_alarm">
+                    Código de la demo en GitHub
+                </a>
+            </section>
+            <section style="top: 41px; display: none;" data-markdown="" data-markdown-parsed="true" class="past"
+                data-fragment="3" hidden="" aria-hidden="true" data-index-h="20">
+                <h2 id="¿cómo-encontrar-alarmmp3">¿Cómo encontrar alarm.mp3?</h2>
+                <ul>
+                    <li class="fragment visible" data-fragment-index="0">importlib puede encontrar archivos
+                        contenidos en paquetes Python <!-- --></li>
+                    <li class="fragment visible" data-fragment-index="1">importlib.resources.files() retorna un
+                        objeto que representa al paquete <!-- --></li>
+                    <li class="fragment visible" data-fragment-index="2">Con ese objeto y el nombre del archivo
+                        podemos obtener un objeto que representa al archivo <!-- --></li>
+                    <li class="fragment visible" data-fragment-index="3">Finalmente importlib.resources.as_file()
+                        permite acceder al archivo <!-- --></li>
+                </ul>
+            </section>
+            <section style="top: 0px; display: none;" data-markdown="" data-markdown-parsed="true" class="past"
+                hidden="" aria-hidden="true" data-index-h="21">
+                <pre class="code-wrapper"><code class="diff hljs language-diff">+from importlib import resources
+...
++mp3resource = resources.files("pomodorotk").joinpath("alarm.mp3")
++with resources.as_file(mp3resource) as mp3file:
++    alarm_sound = AudioSegment.from_mp3(mp3file)</code></pre>
+            </section>
+            <section style="top: 0px; display: none;" data-markdown="" data-markdown-parsed="true" class="past"
+                hidden="" aria-hidden="true" data-index-h="22">
+                <h2 id="demo-v2">Demo v2</h2>
+                <pre
+                    class="code-wrapper"><code data-trim data-noescape>~/git/charla-paquetes/venv-v2</code></pre>
+                <a href="https://github.com/fernandolopez/pomodorotk/tree/pomodoro_v2_importlib">
+                    Código de la demo en GitHub
+                </a>
+                </section>
+            <section style="top: 0px; display: none;" data-markdown="" data-markdown-parsed="true" class="past"
+                hidden="" aria-hidden="true" data-index-h="23">
+                <h2 id="¿cómo-ejecutarlo-sin-python--m">¿Cómo ejecutarlo sin <code>python -m</code>?</h2>
+                <ul>
+                    <li>Necesitamos crear un script</li>
+                    <li>Definimos el script en pyproject.toml
+                        <pre class="code-wrapper"><code class="toml hljs language-ini">[tool.poetry.scripts]
+pomodoro = "pomodorotk.pomodoro:main"</code></pre>
+                    </li>
+                    <li>Movemos el código que estaba suelto a una función main</li>
+                    <li>Podemos probar con <code>poetry run pomodoro</code></li>
+                </ul>
+            </section>
+            <section style="top: 0px; display: none;" data-markdown="" data-markdown-parsed="true" class="past"
+                hidden="" aria-hidden="true" data-index-h="24">
+                <h2 id="demo-v3">Demo v3</h2>
+                <pre
+                    class="code-wrapper"><code data-trim data-noescape>~/git/charla-paquetes/venv-v3</code></pre>
+                <a href="https://github.com/fernandolopez/pomodorotk/tree/pomodoro_v3_script">
+                    Código de la demo en GitHub
+                </a>
+                </section>
+            <section style="top: 0px; display: none;" data-markdown="" data-markdown-parsed="true" class="past"
+                data-fragment="1" hidden="" aria-hidden="true" data-index-h="25">
+                <h2 id="¿se-puede-distribuir-una-app-en-un-archivo">¿Se puede distribuir una app en un archivo?</h2>
+                <ul>
+                    <li class="fragment visible" data-fragment-index="0">Sí <!-- --></li>
+                    <li class="fragment visible" data-fragment-index="1">Como siempre hay varias alternativas como:
+                        <!-- -->
+                        <ul>
+                            <li class="fragment visible" data-fragment-index="1">pyinstaller <!-- --></li>
+                            <li class="fragment visible" data-fragment-index="1">zipapp <!-- --></li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+            <section style="top: 0px; display: none;" data-markdown="" data-markdown-parsed="true" class="past"
+                data-fragment="2" hidden="" aria-hidden="true" data-index-h="26">
+                <h2 id="zipapp">zipapp</h2>
+                <ul>
+                    <li class="fragment visible" data-fragment-index="0">Incluido en Python <!-- --></li>
+                    <li class="fragment visible" data-fragment-index="1">Genera un zip con los módulos <!-- --></li>
+                    <li class="fragment visible" data-fragment-index="2">Necesita que el intérprete esté instalado
+                        para funcionar <!-- --></li>
+                </ul>
+
+            </section>
+            <section style="top: 0px; display: none;" data-markdown="" data-markdown-parsed="true" class="past"
+                hidden="" aria-hidden="true" data-index-h="27">
+                <h2 id="__main__py">__main__.py</h2>
+                <ul>
+                    <li>A la misma altura de <code>pomodorotk</code> debemos crear <code>__main__.py</code></li>
+                </ul>
+                <pre class="code-wrapper"><code>from pomodorotk.pomodoro import main
+
+if __name__ == "__main__":
+    main()</code></pre>
+            </section>
+            <section style="top: 152px; display: block;" data-markdown="" data-markdown-parsed="true" class="past"
+                hidden="" aria-hidden="true" data-index-h="28">
+                <pre class="code-wrapper"><code># Instalamos las dependencias en la carpeta del proyecto para incluirlas en la zipapp
+poetry export -f requirements.txt --output requirements.txt
+pip install -r requirements.txt --target .
+
+# Vamos al directorio que contiene el proyecto
+cd ..
+
+# Generamos la zipapp
+python -m zipapp pomodoro
+
+# La podemos ejecutar con
+python pomodoro.pyz</code></pre>
+            <a href="https://github.com/fernandolopez/pomodorotk/tree/pomodoro_v4_zipapp">
+                Código de la demo en GitHub
+            </a>
+            </section>
+            <section style="top: 50px; display: block;" data-markdown="" data-markdown-parsed="true" class="past"
+                hidden="" aria-hidden="true" data-index-h="29">
+                <h2 id="repaso">Repaso</h2>
+                <ul>
+                    <li>Un módulo es un <code>.py</code></li>
+                    <li>Un paquete es una carpeta con un <code>__init__.py</code> adentro</li>
+                    <li>Poetry permite crear un paquete instalable con pip de forma conveniente</li>
+                    <li>zipapp permite distribuir un proyecto de forma cómoda (siempre que se tenga Python
+                        instalado)</li>
+                    <li>Yapa: <code>__main__.py</code> permite que un directorio sea ejecutable</li>
+                </ul>
+            </section>
+            <section style="top: 55px; display: block;" data-markdown="" data-markdown-parsed="true"
+                data-background="#004e78" class="has-light-background present" data-index-h="30"><!-- -->
+                <h2 id="fin">FIN</h2>
+                <h3 id="¿preguntas">¿Preguntas?</h3>
+                <div class="presentation">
+                    <div class="presentation-text">
+                        <img src="assets/github.png" alt="linkedin">
+                        <p style="margin:0 !important"><a href="https://github.com/fernandolopez">github</a></p>
+                    </div>
+                    <div class="presentation-text">
+                        <img src="assets/cv.png" alt="linkedin">
+                        <p style="margin:0 !important"><a href="https://www.linkedin.com/in/fernandoemlopez/">linkedin</a></p>
+                    </div>
+                </div>
+                <p>¡Gracias!</p>
+            </section>
+        </div>
+        <script src="dist/reveal.js"></script>
+        <script src="plugin/notes/notes.js"></script>
+        <script src="plugin/highlight/highlight.js"></script>
+        <script>
+            // More info about initialization & config:
+            // - https://revealjs.com/initialization/
+            // - https://revealjs.com/config/
+            Reveal.initialize({
+                hash: true,
+
+                // Learn about plugins: https://revealjs.com/plugins/
+                plugins: [RevealHighlight, RevealNotes]
+            });
+        </script>
+</body>
+
+</html>
